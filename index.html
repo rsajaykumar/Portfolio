@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Droneline - Medical Delivery</title>
+    
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Styles -->
+    <style>
+        :root {
+            --color-primary: #0062ff; /* A trustworthy, catchy blue */
+            --color-primary-dark: #004ecc;
+            --color-primary-light: #e6f0ff;
+            --color-green: #10b981;
+            --color-yellow: #f59e0b;
+            --color-red: #ef4444;
+            --color-text: #1f2937;
+            --color-text-light: #6b7280;
+            --color-bg: #f3f4f6;
+            --color-card: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-md: 0.5rem;  /* 8px */
+            --radius-lg: 0.75rem; /* 12px */
+            --radius-xl: 1rem;   /* 16px */
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Main App Container */
+        .app-container {
+            max-width: 28rem; /* 448px */
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: var(--color-bg);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1;
+            padding: 1rem;
+        }
+        
+        /* App Header */
+        #app-header {
+            background-color: var(--color-card);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            border-bottom-left-radius: var(--radius-xl);
+            border-bottom-right-radius: var(--radius-xl);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: none; /* Hidden by default */
+        }
+        
+        #app-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .logo-icon-bg {
+            background-color: var(--color-primary);
+            border-radius: var(--radius-md);
+            padding: 0.5rem;
+            display: grid;
+            place-items: center;
+        }
+        
+        .logo .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: white;
+        }
+        
+        .logo h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .cart-button {
+            position: relative;
+        }
+        
+        .cart-button .icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: var(--color-text-light);
+        }
+        
+        #cart-item-count {
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+            background-color: var(--color-red);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 99px;
+            width: 1.25rem;
+            height: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0);
+            transition: transform 0.2s ease-out;
+        }
+        
+        #cart-item-count.visible {
+            transform: scale(1);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+        }
+        
+        .user-info .icon {
+            width: 1rem;
+            height: 1rem;
+        }
+        
+        .user-info span {
+            font-family: monospace;
+        }
+        
+        /* Page Containers */
+        .page-container {
+            display: none; /* Pages are hidden by default */
+        }
+        
+        #page-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        /* General Components */
+        .card {
+            background-color: var(--color-card);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem; /* 24px */
+        }
+        
+        .page-title {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            font-size: 1rem;
+            color: var(--color-text-light);
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-lg);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            width: 100%;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--color-primary-dark);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        
+        /* Loader */
+        .loader {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Login Page */
+        #page-login .card {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .logo-icon-xl {
+            background-color: var(--color-primary);
+            border-radius: 99px;
+            padding: 1rem;
+            display: inline-flex;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-icon-xl .icon {
+            width: 2.5rem; /* 40px */
+            height: 2.5rem;
+            color: white;
+        }
+        
+        #page-login h2 {
+            font-size: 1.875rem; /* 30px */
+            font-weight: 700;
+            color: var(--color-text);
+        }
+        
+        #page-login p {
+            color: var(--color-text-light);
+            margin-top: 0.5rem;
+        }
+        
+        #page-login .space-y-4 {
+            margin-top: 1.5rem;
+        }
+        
+        #page-login .tos {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 1rem;
+        }
+        
+        /* Store Select Page */
+        .store-list-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            text-align: left;
+            padding: 1.25rem;
+            background-color: var(--color-card);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .store-list-item:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+        
+        .store-icon-bg {
+            background-color: var(--color-primary-light);
+            border-radius: var(--radius-lg);
+            padding: 0.75rem;
+            display: grid;
+            place-items: center;
+        }
+        
+        .store-icon-bg .icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: var(--color-primary);
+        }
+        
+        .store-info {
+            flex: 1;
+        }
+        
+        .store-info h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+        
+        .store-info p {
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+        }
+        
+        .store-list-item .icon-chevron {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #9ca3af;
+        }
+        
+        /* Medicine Menu Page */
+        .category-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+        }
+        
+        .medicine-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background-color: var(--color-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 0.75rem;
+        }
+        
+        .medicine-info h4 {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+        
+        .medicine-info p {
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+        }
+        
+        .btn-add-cart {
+            background-color: var(--color-primary-light);
+            color: var(--color-primary);
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+        
+        .btn-add-cart:hover {
+            background-color: #dbeaff;
+        }
+        
+        #view-cart-button {
+            position: sticky;
+            bottom: 1rem;
+            z-index: 5;
+            box-shadow: var(--shadow-lg);
+            display: none; /* Hidden by default */
+            justify-content: space-between;
+        }
+        
+        /* Cart Page */
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+        }
+        
+        .cart-item:first-child {
+            padding-top: 0;
+        }
+        
+        .cart-item-info h4 {
+            font-weight: 600;
+        }
+        .cart-item-info p {
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+        }
+        
+        .cart-quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .cart-quantity-controls button {
+            background-color: #e5e7eb;
+            color: var(--color-text-light);
+            border: none;
+            border-radius: 99px;
+            width: 1.75rem;
+            height: 1.75rem;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+        }
+        
+        .cart-quantity-controls .icon {
+            width: 1rem;
+            height: 1rem;
+        }
+        
+        .cart-quantity-controls span {
+            font-weight: 600;
+            width: 2rem;
+            text-align: center;
+        }
+        
+        .divider {
+            border-top: 1px solid #e5e7eb;
+            margin: 1rem 0;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .total-row span:first-child {
+            color: var(--color-text-light);
+        }
+        
+        .total-row span:last-child {
+            color: var(--color-text);
+            font-size: 1.25rem;
+        }
+        
+        /* Checkout Page */
+        .form-section {
+            background-color: var(--color-card);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-section h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 1.5rem;
+            border: 2px dashed #d1d5db;
+            border-radius: var(--radius-lg);
+            background-color: #f9fafb;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .upload-label:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .upload-label .icon {
+            width: 2rem;
+            height: 2rem;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-label .upload-text {
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+        
+        .upload-label .upload-hint {
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+        }
+        
+        .checkbox-group input {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 0.25rem;
+            border-color: #d1d5db;
+            color: var(--color-primary);
+        }
+        
+        .checkbox-group label {
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+        }
+        
+        .payment-option {
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            border: 2px solid #d1d5db;
+            background-color: var(--color-card);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 0.75rem;
+        }
+        
+        .payment-option.selected {
+            border-color: var(--color-primary);
+            background-color: var(--color-primary-light);
+            box-shadow: 0 0 0 2px var(--color-primary-light);
+        }
+        
+        .payment-option span {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+        
+        #checkout-summary {
+            position: sticky;
+            bottom: 0;
+            padding-top: 1rem;
+            background-color: var(--color-bg);
+            /* To avoid content clipping at bottom */
+            margin-bottom: -1rem;
+            padding-bottom: 1rem;
+        }
+        
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--color-text-light);
+            cursor: pointer;
+            font-size: 0.875rem;
+            padding: 0.5rem;
+            width: 100%;
+        }
+        .btn-link:hover {
+            color: var(--color-primary);
+        }
+        
+        /* Order Tracking Page */
+        .map-placeholder {
+            width: 100%;
+            height: 12rem; /* 192px */
+            background-color: #e5e7eb;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: var(--color-text-light);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tracking-steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .tracking-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .tracking-icon {
+            display: grid;
+            place-items: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 99px;
+            background-color: #d1d5db; /* Default */
+            transition: all 0.3s ease;
+        }
+        
+        .tracking-icon .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: white;
+        }
+        
+        .tracking-step h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #9ca3af; /* Default */
+            transition: all 0.3s ease;
+        }
+        
+        .tracking-step .icon-loader {
+            margin-left: auto;
+            display: none;
+        }
+        
+        /* Step Active State */
+        .tracking-step.active .tracking-icon {
+            background-color: var(--color-primary);
+        }
+        .tracking-step.active h3 {
+            color: var(--color-primary);
+        }
+        .tracking-step.active .icon-loader {
+            display: block;
+            color: var(--color-primary);
+        }
+        
+        /* Step Completed State */
+        .tracking-step.completed .tracking-icon {
+            background-color: var(--color-green);
+        }
+        .tracking-step.completed h3 {
+            color: var(--color-green);
+        }
+        
+        .order-id-footer {
+            border-top: 1px solid #e5e7eb;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+            word-break: break-all;
+        }
+        
+        /* Rating Page */
+        #page-rating .card {
+            text-align: center;
+        }
+        
+        .stars-icon-xl {
+            display: inline-flex;
+            margin-bottom: 1rem;
+        }
+        
+        .stars-icon-xl .icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            color: var(--color-yellow);
+        }
+        
+        #page-rating h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+        
+        #page-rating p {
+            color: var(--color-text-light);
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stars-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stars-container button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        .stars-container .icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            color: #d1d5db;
+            transition: all 0.2s ease;
+        }
+        
+        .stars-container button:hover .icon,
+        .stars-container button.selected .icon {
+            color: var(--color-yellow);
+            transform: scale(1.1);
+        }
+        
+        /* This handles the "hover trail" */
+        .stars-container:hover button .icon {
+            color: var(--color-yellow);
+        }
+        
+        .stars-container button:hover ~ button .icon {
+            color: #d1d5db;
+        }
+        
+        /* This handles the "selected trail" */
+        .stars-container.selected button.selected ~ button .icon {
+            color: #d1d5db;
+        }
+        
+        
+        /* Modal */
+        #modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 40;
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        #modal-box {
+            background-color: var(--color-card);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 24rem;
+            padding: 1.5rem;
+            position: relative;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+        }
+        
+        #modal-overlay.visible {
+            display: flex;
+        }
+        
+        #modal-overlay.visible #modal-box {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        #modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        #modal-message {
+            color: var(--color-text-light);
+            margin-bottom: 1.5rem;
+        }
+        
+        #modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+        
+        #modal-close-btn:hover {
+            color: var(--color-text);
+        }
+        
+        #modal-close-btn .icon {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 
+      Icon Definitions
+      We define all SVGs here as symbols and reuse them with <use>.
+      This is the standard, most performant way in HTML.
+    -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="icon-pill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/>
+            <path d="m8.5 8.5 7 7"/>
+        </symbol>
+        <symbol id="icon-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </symbol>
+        <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </symbol>
+        <symbol id="icon-map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+        </symbol>
+        <symbol id="icon-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+        </symbol>
+        <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </symbol>
+        <symbol id="icon-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+        </symbol>
+        <symbol id="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+        </symbol>
+        <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </symbol>
+        <symbol id="icon-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+        </symbol>
+        <symbol id="icon-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+        </symbol>
+        <symbol id="icon-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="16.5" y1="9.4" x2="7.5" y2="4.2"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+        </symbol>
+        <symbol id="icon-star" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </symbol>
+        <symbol id="icon-loader" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+            <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+            <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+            <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+        </symbol>
+    </svg>
+
+    <!-- App Container -->
+    <div class="app-container">
+    
+        <!-- Modal -->
+        <div id="modal-overlay">
+            <div id="modal-box">
+                <button id="modal-close-btn" aria-label="Close modal">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-x" /></svg>
+                </button>
+                <h3 id="modal-title">Modal Title</h3>
+                <p id="modal-message">Modal message goes here.</p>
+                <button id="modal-confirm-btn" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+
+        <!-- App Header -->
+        <header id="app-header">
+            <div id="app-header-content">
+                <a href="#" class="logo" onclick="event.preventDefault(); window.location.reload();">
+                    <div class="logo-icon-bg">
+                        <svg class="icon" aria-hidden="true"><use href="#icon-pill" /></svg>
+                    </div>
+                    <h1>Droneline</h1>
+                </a>
+                <div class="header-actions">
+                    <button class="cart-button" aria-label="View Cart" id="header-cart-btn">
+                        <svg class="icon" aria-hidden="true"><use href="#icon-cart" /></svg>
+                        <span id="cart-item-count">0</span>
+                    </button>
+                    <div class="user-info">
+                        <svg class="icon" aria-hidden="true"><use href="#icon-user" /></svg>
+                        <span id="header-user-id">...</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main content area where pages are swapped -->
+        <main>
+        
+            <!-- 1. Login Page -->
+            <div id="page-login" class="page-container">
+                <div class="card">
+                    <div class="logo-icon-xl">
+                        <svg class="icon" aria-hidden="true"><use href="#icon-pill" /></svg>
+                    </div>
+                    <h2>Welcome to Droneline</h2>
+                    <p>Fast medicine delivery, by drone.</p>
+                    <div class="space-y-4">
+                        <button id="login-btn" class="btn btn-primary">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-user" /></svg>
+                            <span>Sign In / Continue as Guest</span>
+                        </button>
+                        <p class="tos">By continuing, you agree to our Terms of Service.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2. Store Selection Page -->
+            <div id="page-store-select" class="page-container">
+                <h2 class="page-title">Nearby Stores</h2>
+                <div id="store-list-container">
+                    <!-- Store items will be injected here by JS -->
+                </div>
+            </div>
+            
+            <!-- 3. Medicine Menu Page -->
+            <div id="page-medicine-menu" class="page-container">
+                <h2 class="page-title" id="menu-store-name">Store Name</h2>
+                <p class="page-subtitle">Select medicines to add to your cart.</p>
+                <div id="medicine-menu-container">
+                    <!-- Medicine categories and items will be injected here by JS -->
+                </div>
+                <button id="view-cart-button" class="btn btn-primary">
+                    <span>View Cart (0 items)</span>
+                    <svg class="icon" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
+                </button>
+            </div>
+            
+            <!-- 4. Cart Page -->
+            <div id="page-cart" class="page-container">
+                <h2 class="page-title">Your Cart</h2>
+                <div id="cart-empty-message" style="display: none;">
+                    <p class="page-subtitle" style="text-align: center; padding: 2rem 0;">Your cart is empty.</p>
+                </div>
+                <div id="cart-contents">
+                    <div class="card">
+                        <div id="cart-items-container">
+                            <!-- Cart items will be injected here by JS -->
+                        </div>
+                    </div>
+                    <div class="card" style="margin-top: 1rem;">
+                        <div class="total-row">
+                            <span>Total</span>
+                            <span id="cart-total-price">₹0.00</span>
+                        </div>
+                        <button id="go-to-checkout-btn" class="btn btn-primary">
+                            Proceed to Checkout
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 5. 7. Checkout Page -->
+            <div id="page-checkout" class="page-container">
+                <h2 class="page-title">Checkout</h2>
+                
+                <!-- 5. Prescription Upload -->
+                <div class="form-section">
+                    <h3>Doctor's Prescription</h3>
+                    <label for="prescription-upload" class="upload-label">
+                        <svg class="icon" aria-hidden="true"><use href="#icon-upload" /></svg>
+                        <span class="upload-text" id="upload-file-name">Upload Prescription</span>
+                        <span class="upload-hint">PNG, JPG, or PDF</span>
+                    </label>
+                    <input id="prescription-upload" type="file" class="hidden" style="display: none;">
+                    
+                    <div class="checkbox-group">
+                        <input id="prescription-optional" type="checkbox">
+                        <label for="prescription-optional">Prescription is optional / Not required</label>
+                    </div>
+                </div>
+                
+                <!-- 7. Payment Options -->
+                <div class="form-section">
+                    <h3>Payment Method</h3>
+                    <div id="payment-options-container">
+                        <button class="payment-option" data-method="GPay / PhonePe">
+                            <span>GPay / PhonePe</span>
+                        </button>
+                        <button class="payment-option" data-method="Credit/Debit Card">
+                            <span>Credit/Debit Card</span>
+                        </button>
+                        <button class="payment-option" data-method="Razorpay">
+                            <span>Razorpay</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Order Summary & Place Order -->
+                <div id="checkout-summary">
+                    <div class="card">
+                        <div class="total-row">
+                            <span>Total to Pay</span>
+                            <span id="checkout-total-price">₹0.00</span>
+                        </div>
+                        <button id="place-order-btn" class="btn btn-primary" disabled>
+                            <span>Place Order</span>
+                        </button>
+                        <button id="back-to-cart-btn" class="btn-link">
+                            &larr; Back to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 8. 9. Order Tracking Page -->
+            <div id="page-tracking" class="page-container">
+                <h2 class="page-title">Order Tracking</h2>
+                <div class="card">
+                    <div class="map-placeholder">
+                        [Live Map Placeholder]
+                        <br>
+                        (Drone ETA: <span id="drone-eta">...</span>)
+                    </div>
+                    
+                    <div class="tracking-steps-container" id="tracking-steps">
+                        <!-- Step 1: Placed -->
+                        <div class="tracking-step" data-status="Pending">
+                            <div class="tracking-icon">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-circle" /></svg>
+                            </div>
+                            <h3>Order Placed</h3>
+                            <svg class="icon icon-loader loader" aria-hidden="true"><use href="#icon-loader" /></svg>
+                        </div>
+                        <!-- Step 2: Confirmed -->
+                        <div class="tracking-step" data-status="Confirmed">
+                            <div class="tracking-icon">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-check-circle" /></svg>
+                            </div>
+                            <h3>Order Confirmed</h3>
+                            <svg class="icon icon-loader loader" aria-hidden="true"><use href="#icon-loader" /></svg>
+                        </div>
+                        <!-- Step 3: Dispatched -->
+                        <div class="tracking-step" data-status="Dispatched">
+                            <div class="tracking-icon">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-package" /></svg>
+                            </div>
+                            <h3>Drone Dispatched</h3>
+                            <svg class="icon icon-loader loader" aria-hidden="true"><use href="#icon-loader" /></svg>
+                        </div>
+                        <!-- Step 4: Delivered -->
+                        <div class="tracking-step" data-status="Delivered">
+                            <div class="tracking-icon">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-star" /></svg>
+                            </div>
+                            <h3>Order Delivered</h3>
+                            <svg class="icon icon-loader loader" aria-hidden="true"><use href="#icon-loader" /></svg>
+                        </div>
+                    </div>
+                    
+                    <div class="order-id-footer">
+                        Order ID: <span id="tracking-order-id">...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 10. Rating Page -->
+            <div id="page-rating" class="page-container">
+                <div class="card">
+                    <div class="stars-icon-xl">
+                        <svg class="icon" aria-hidden="true"><use href="#icon-star" /></svg>
+                    </div>
+                    <h2>Order Delivered!</h2>
+                    <p>How was your delivery experience?</p>
+                    <div class="stars-container" id="rating-stars">
+                        <button data-value="1" aria-label="1 star">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-star" /></svg>
+                        </button>
+                        <button data-value="2" aria-label="2 stars">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-star" /></svg>
+                        </button>
+                        <button data-value="3" aria-label="3 stars">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-star" /></svg>
+                        </button>
+                        <button data-value="4" aria-label="4 stars">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-star" /></svg>
+                        </button>
+                        <button data-value="5" aria-label="5 stars">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-star" /></svg>
+                        </button>
+                    </div>
+                    <button id="submit-rating-btn" class="btn btn-primary" disabled>
+                        Submit Rating
+                    </button>
+                </div>
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+          getAuth, 
+          signInAnonymously, 
+          onAuthStateChanged, 
+          signInWithCustomToken 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+          getFirestore, 
+          doc, 
+          addDoc, 
+          collection, 
+          onSnapshot, 
+          updateDoc,
+          serverTimestamp,
+          setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Mock Data ---
+        const MOCK_STORES = [
+          { id: 'store1', name: 'Apollo Pharmacy', distance: '1.2km', eta: '5-10 min' },
+          { id: 'store2', name: 'MedPlus', distance: '2.5km', eta: '10-15 min' },
+          { id: 'store3', name: 'Wellness Forever', distance: '3.1km', eta: '15-20 min' },
+        ];
+        
+        const MOCK_MEDICINES = {
+          store1: {
+            'Headache & Fever': [
+              { id: 'med101', name: 'Dolo 650', price: 30.50 },
+              { id: 'med102', name: 'Crocin Advance', price: 25.00 },
+            ],
+            'Cold & Cough': [
+              { id: 'med103', name: 'Vicks Action 500', price: 45.00 },
+              { id: 'med104', name: 'Benadryl', price: 120.00 },
+            ],
+            'Stomach Ache': [
+              { id: 'med105', name: 'Pudin Hara', price: 60.00 },
+              { id: 'med106', name: 'Digene', price: 80.00 },
+            ],
+          },
+          store2: {
+            'Headache & Fever': [
+              { id: 'med201', name: 'Paracetamol 500mg', price: 28.00 },
+              { id: 'med202', name: 'Sumo Cold', price: 55.00 },
+            ],
+            'First Aid': [
+              { id: 'med203', name: 'Band-Aid (Pack)', price: 75.00 },
+              { id: 'med204', name: 'Dettol', price: 90.00 },
+            ],
+          },
+          store3: {
+            'Pain Relief': [
+              { id: 'med301', name: 'Volini Spray', price: 150.00 },
+              { id: 'med302', name: 'Moov', price: 140.00 },
+            ],
+            'Vitamins & Supplements': [
+              { id: 'med303', name: 'Revital H', price: 310.00 },
+              { id: 'med304', name: 'Limcee', price: 22.00 },
+            ],
+          },
+        };
+
+        // --- Firebase Config ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+          ? JSON.parse(__firebase_config) 
+          : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-droneline-app';
+
+        // --- App State ---
+        let view = 'login';
+        let cart = [];
+        let selectedStore = null;
+        let currentOrder = null;
+        let auth, db, userId;
+        let isAuthReady = false;
+        
+        let prescriptionFile = null;
+        let prescriptionOptional = false;
+        let paymentMethod = null;
+        let currentRating = 0;
+        
+        let orderStatusListener = null; // To hold the unsubscribe function
+        let orderSimulationTimeouts = [];
+
+        // --- DOM Element References ---
+        const appHeader = document.getElementById('app-header');
+        const headerUserId = document.getElementById('header-user-id');
+        const headerCartButton = document.getElementById('header-cart-btn');
+        const cartItemCount = document.getElementById('cart-item-count');
+        const allPages = document.querySelectorAll('.page-container');
+        
+        // Pages
+        const pageLogin = document.getElementById('page-login');
+        const pageStoreSelect = document.getElementById('page-store-select');
+        const pageMedicineMenu = document.getElementById('page-medicine-menu');
+        const pageCart = document.getElementById('page-cart');
+        const pageCheckout = document.getElementById('page-checkout');
+        const pageTracking = document.getElementById('page-tracking');
+        const pageRating = document.getElementById('page-rating');
+        
+        // Modal
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalBox = document.getElementById('modal-box');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+        
+        // --- Helper Functions ---
+        
+        /**
+         * Central function to change the visible page.
+         */
+        function renderView(newView) {
+            view = newView;
+            allPages.forEach(page => page.style.display = 'none');
+            
+            if (view === 'login') {
+                pageLogin.style.display = 'flex';
+                appHeader.style.display = 'none';
+            } else {
+                const pageToShow = document.getElementById(`page-${view}`);
+                if (pageToShow) {
+                    pageToShow.style.display = 'block';
+                }
+                appHeader.style.display = 'block';
+            }
+            
+            // Scroll to top on page change
+            window.scrollTo(0, 0);
+        }
+        
+        /**
+         * Shows or hides a loading spinner inside a button.
+         */
+        function setButtonLoading(button, isLoading) {
+            if (isLoading) {
+                button.disabled = true;
+                const span = button.querySelector('span');
+                if(span) span.style.display = 'none';
+                
+                // Add loader if it doesn't exist
+                if (!button.querySelector('.loader')) {
+                    const loaderIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    loaderIcon.setAttribute('class', 'icon loader');
+                    loaderIcon.innerHTML = '<use href="#icon-loader" />';
+                    button.prepend(loaderIcon);
+                }
+            } else {
+                button.disabled = false;
+                const span = button.querySelector('span');
+                if(span) span.style.display = 'inline';
+                
+                const loader = button.querySelector('.loader');
+                if (loader) loader.remove();
+            }
+        }
+        
+        /**
+         * Formats a number as Indian Rupees.
+         */
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+            }).format(amount);
+        }
+        
+        /**
+         * Shows the modal with a title and message.
+         */
+        function showModal(title, message, showConfirm = true) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modalConfirmBtn.style.display = showConfirm ? 'block' : 'none';
+            modalOverlay.classList.add('visible');
+        }
+        
+        /**
+         * Hides the modal.
+         */
+        function closeModal() {
+            modalOverlay.classList.remove('visible');
+        }
+        
+        /**
+         * Updates the cart count in the header.
+         */
+        function updateCartCount() {
+            if (cart.length > 0) {
+                cartItemCount.textContent = cart.length;
+                cartItemCount.classList.add('visible');
+            } else {
+                cartItemCount.classList.remove('visible');
+            }
+        }
+        
+        /**
+         * Updates the state of the checkout button (disabled/enabled).
+         */
+        function validateCheckout() {
+            const placeOrderBtn = document.getElementById('place-order-btn');
+            const prescriptionValid = prescriptionOptional || prescriptionFile;
+            const paymentValid = !!paymentMethod;
+            
+            placeOrderBtn.disabled = !(prescriptionValid && paymentValid);
+        }
+        
+        // --- Render Functions (Populating UI) ---
+        
+        /**
+         * 1. Renders the list of stores.
+         */
+        function renderStoreSelect() {
+            const container = document.getElementById('store-list-container');
+            container.innerHTML = ''; // Clear existing
+            
+            MOCK_STORES.forEach(store => {
+                container.innerHTML += `
+                    <button class="store-list-item" data-store-id="${store.id}">
+                        <div class="store-icon-bg">
+                            <svg class="icon" aria-hidden="true"><use href="#icon-map-pin" /></svg>
+                        </div>
+                        <div class="store-info">
+                            <h3>${store.name}</h3>
+                            <p>${store.distance} away &bull; ${store.eta} delivery</p>
+                        </div>
+                        <svg class="icon icon-chevron" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
+                    </button>
+                `;
+            });
+        }
+        
+        /**
+         * 2. Renders the medicine menu for the selected store.
+         */
+        function renderMedicineMenu() {
+            const container = document.getElementById('medicine-menu-container');
+            const storeNameEl = document.getElementById('menu-store-name');
+            const viewCartBtn = document.getElementById('view-cart-button');
+            
+            container.innerHTML = '';
+            storeNameEl.textContent = selectedStore.name;
+            
+            const menu = MOCK_MEDICINES[selectedStore.id] || {};
+            const categories = Object.keys(menu);
+            
+            if (categories.length === 0) {
+                container.innerHTML = '<p class="page-subtitle" style="text-align: center;">No medicines found for this store.</p>';
+            }
+            
+            categories.forEach(category => {
+                let categoryHtml = `<h3 class="category-title">${category}</h3>`;
+                
+                menu[category].forEach(med => {
+                    categoryHtml += `
+                        <div class="medicine-item">
+                            <div class="medicine-info">
+                                <h4>${med.name}</h4>
+                                <p>${formatCurrency(med.price)}</p>
+                            </div>
+                            <button class="btn-add-cart" data-med-id="${med.id}" data-med-name="${med.name}" data-med-price="${med.price}">
+                                Add
+                            </button>
+                        </div>
+                    `;
+                });
+                container.innerHTML += categoryHtml;
+            });
+            
+            // Show/hide cart button
+            viewCartBtn.style.display = cart.length > 0 ? 'flex' : 'none';
+            viewCartBtn.querySelector('span').textContent = `View Cart (${cart.length} items)`;
+        }
+        
+        /**
+         * 3. Renders the items in the cart.
+         */
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const totalEl = document.getElementById('cart-total-price');
+            const emptyMsg = document.getElementById('cart-empty-message');
+            const cartContents = document.getElementById('cart-contents');
+            
+            container.innerHTML = '';
+            
+            if (cart.length === 0) {
+                emptyMsg.style.display = 'block';
+                cartContents.style.display = 'none';
+                return;
+            }
+            
+            emptyMsg.style.display = 'none';
+            cartContents.style.display = 'block';
+            
+            // Group items by id and count quantity
+            const grouped = cart.reduce((acc, item) => {
+              if (!acc[item.id]) {
+                acc[item.id] = { ...item, quantity: 0 };
+              }
+              acc[item.id].quantity += 1;
+              return acc;
+            }, {});
+            
+            const cartWithSubtotals = Object.values(grouped);
+            let total = 0;
+            
+            cartWithSubtotals.forEach((item, index) => {
+                total += item.price * item.quantity;
+                container.innerHTML += `
+                    ${index > 0 ? '<div class="divider"></div>' : ''}
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p>${formatCurrency(item.price)}</p>
+                        </div>
+                        <div class="cart-quantity-controls">
+                            <button class="cart-quantity-btn" data-action="remove" data-med-id="${item.id}" aria-label="Remove one">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-minus" /></svg>
+                            </button>
+                            <span>${item.quantity}</span>
+                            <button class="cart-quantity-btn" data-action="add" data-med-id="${item.id}" data-med-name="${item.name}" data-med-price="${item.price}" aria-label="Add one">
+                                <svg class="icon" aria-hidden="true"><use href="#icon-plus" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            totalEl.textContent = formatCurrency(total);
+            
+            // Update checkout page total as well
+            document.getElementById('checkout-total-price').textContent = formatCurrency(total);
+        }
+        
+        /**
+         * 4. Updates the tracking UI based on the current order status.
+         */
+        function updateTrackingUI(status) {
+            const steps = document.querySelectorAll('#tracking-steps .tracking-step');
+            const statusOrder = ['Pending', 'Confirmed', 'Dispatched', 'Delivered'];
+            const currentStatusIndex = statusOrder.indexOf(status);
+            
+            const etaEl = document.getElementById('drone-eta');
+            const etaMap = {
+                'Pending': '15-20 min',
+                'Confirmed': '10-15 min',
+                'Dispatched': '5-10 min',
+                'Delivered': 'Arrived',
+            };
+            etaEl.textContent = etaMap[status] || '...';
+            
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                
+                if (index < currentStatusIndex) {
+                    step.classList.add('completed');
+                } else if (index === currentStatusIndex) {
+                    step.classList.add('active');
+                }
+            });
+        }
+        
+        
+        // --- Event Handlers ---
+        
+        function handleStoreSelect(storeId) {
+            selectedStore = MOCK_STORES.find(s => s.id === storeId);
+            cart = []; // Clear cart when changing stores
+            updateCartCount();
+            renderMedicineMenu();
+            renderView('medicine-menu');
+        }
+        
+        function handleAddToCart(med) {
+            cart.push(med);
+            updateCartCount();
+            // Update the cart button on the menu page
+            const viewCartBtn = document.getElementById('view-cart-button');
+            viewCartBtn.style.display = 'flex';
+            viewCartBtn.querySelector('span').textContent = `View Cart (${cart.length} items)`;
+        }
+        
+        function handleUpdateQuantity(action, med) {
+            if (action === 'add') {
+                cart.push(med);
+            } else if (action === 'remove') {
+                const index = cart.findIndex(i => i.id === med.id);
+                if (index > -1) {
+                    cart.splice(index, 1);
+                }
+            }
+            renderCart();
+            updateCartCount();
+        }
+        
+        async function handlePlaceOrder(button) {
+            if (!db || !userId) {
+              showModal('Error', 'Database not connected. Cannot place order.');
+              return;
+            }
+            
+            setButtonLoading(button, true);
+            
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            
+            // In a real app, you'd upload prescriptionFile to Firebase Storage here
+            // and get a downloadURL. For this MVP, we just store the name.
+            const prescriptionData = prescriptionFile ? { name: prescriptionFile.name } : null;
+            
+            const orderData = {
+              userId: userId,
+              storeId: selectedStore.id,
+              storeName: selectedStore.name,
+              items: cart, // Storing full cart data
+              total: total,
+              status: 'Pending', // Initial status
+              prescription: prescriptionData,
+              paymentMethod: paymentMethod,
+              createdAt: serverTimestamp(),
+            };
+            
+            try {
+              // Use private user collection path
+              const orderPath = `/artifacts/${appId}/users/${userId}/orders`;
+              const docRef = await addDoc(collection(db, orderPath), orderData);
+              
+              console.log("Order placed with ID:", docRef.id);
+              currentOrder = { id: docRef.id, ...orderData };
+              
+              document.getElementById('tracking-order-id').textContent = docRef.id;
+              
+              // Reset cart and state
+              cart = [];
+              updateCartCount();
+              prescriptionFile = null;
+              prescriptionOptional = false;
+              paymentMethod = null;
+              
+              // Start tracking
+              startOrderTracking(docRef.id);
+              renderView('tracking');
+              
+            } catch (e) {
+              console.error("Error adding document: ", e);
+              showModal('Order Error', 'There was a problem placing your order. Please try again.');
+            } finally {
+              setButtonLoading(button, false);
+            }
+        }
+        
+        function handleOrderDelivered() {
+            // Unsubscribe from listener
+            if (orderStatusListener) {
+                orderStatusListener();
+                orderStatusListener = null;
+            }
+            // Clear simulation timeouts
+            orderSimulationTimeouts.forEach(clearTimeout);
+            orderSimulationTimeouts = [];
+            
+            // Show rating page after a short delay
+            setTimeout(() => {
+                renderView('rating');
+            }, 2000);
+        }
+        
+        function handleSubmitRating() {
+            console.log(`Rating submitted: ${currentRating} stars`);
+            // In a real app, update the order doc with this rating
+            // updateDoc(doc(db, ...), { rating: currentRating });
+            
+            showModal('Thank You!', `Thanks for your ${currentRating}-star feedback!`, false);
+            
+            // Reset for next order
+            setTimeout(() => {
+                closeModal();
+                currentOrder = null;
+                selectedStore = null;
+                currentRating = 0;
+                // Reset stars UI
+                document.getElementById('rating-stars').classList.remove('selected');
+                document.querySelectorAll('#rating-stars button').forEach(b => b.classList.remove('selected'));
+                document.getElementById('submit-rating-btn').disabled = true;
+                
+                renderView('store-select');
+                renderStoreSelect();
+            }, 2000);
+        }
+        
+        // --- Firebase Logic ---
+        
+        function startOrderTracking(orderId) {
+            const orderRef = doc(db, `/artifacts/${appId}/users/${userId}/orders`, orderId);
+
+            // 1. Listen for real-time status changes
+            orderStatusListener = onSnapshot(orderRef, (docSnap) => {
+              if (docSnap.exists()) {
+                const data = docSnap.data();
+                updateTrackingUI(data.status); // Update UI
+                
+                if (data.status === 'Delivered') {
+                  handleOrderDelivered();
+                }
+              } else {
+                showModal('Error', 'Order not found.');
+              }
+            }, (err) => {
+              console.error("Listen error:", err);
+              showModal('Error', 'Could not track order.');
+            });
+
+            // 2. Simulate the backend/store updating the order status
+            // In a real app, this logic would be in a separate admin dashboard.
+            orderSimulationTimeouts = [
+              setTimeout(() => {
+                console.log("Simulating: Order Confirmed");
+                updateDoc(orderRef, { status: 'Confirmed' }).catch(console.error);
+              }, 5000), // 5 seconds
+              setTimeout(() => {
+                console.log("Simulating: Drone Dispatched");
+                updateDoc(orderRef, { status: 'Dispatched' }).catch(console.error);
+              }, 10000), // 10 seconds
+              setTimeout(() => {
+                console.log("Simulating: Order Delivered");
+                updateDoc(orderRef, { status: 'Delivered' }).catch(console.error);
+              }, 15000), // 15 seconds
+            ];
+        }
+
+        // --- Event Listeners ---
+        function bindEventListeners() {
+            
+            // --- Modal ---
+            modalCloseBtn.addEventListener('click', closeModal);
+            modalConfirmBtn.addEventListener('click', closeModal);
+            
+            // --- Login ---
+            document.getElementById('login-btn').addEventListener('click', (e) => {
+                const button = e.currentTarget;
+                setButtonLoading(button, true);
+                // Auth is handled by onAuthStateChanged, which will
+                // automatically move to the 'storeSelect' view.
+                // We just show a loader for effect.
+                setTimeout(() => {
+                    // This is a fallback in case onAuthStateChanged is slow
+                    if (isAuthReady) {
+                        renderView('store-select');
+                        renderStoreSelect();
+                    }
+                    setButtonLoading(button, false);
+                }, 1000);
+            });
+            
+            // --- Header ---
+            headerCartButton.addEventListener('click', () => {
+                renderCart();
+                renderView('cart');
+            });
+            
+            // --- Store Select (Event Delegation) ---
+            document.getElementById('store-list-container').addEventListener('click', (e) => {
+                const storeButton = e.target.closest('.store-list-item');
+                if (storeButton) {
+                    handleStoreSelect(storeButton.dataset.storeId);
+                }
+            });
+            
+            // --- Medicine Menu (Event Delegation) ---
+            document.getElementById('medicine-menu-container').addEventListener('click', (e) => {
+                const addButton = e.target.closest('.btn-add-cart');
+                if (addButton) {
+                    handleAddToCart({
+                        id: addButton.dataset.medId,
+                        name: addButton.dataset.medName,
+                        price: parseFloat(addButton.dataset.medPrice),
+                    });
+                }
+            });
+            
+            document.getElementById('view-cart-button').addEventListener('click', () => {
+                renderCart();
+                renderView('cart');
+            });
+            
+            // --- Cart (Event Delegation) ---
+            document.getElementById('cart-items-container').addEventListener('click', (e) => {
+                const quantityButton = e.target.closest('.cart-quantity-btn');
+                if (quantityButton) {
+                    handleUpdateQuantity(
+                        quantityButton.dataset.action,
+                        {
+                            id: quantityButton.dataset.medId,
+                            name: quantityButton.dataset.medName,
+                            price: parseFloat(quantityButton.dataset.medPrice),
+                        }
+                    );
+                }
+            });
+            
+            document.getElementById('go-to-checkout-btn').addEventListener('click', () => {
+                renderView('checkout');
+            });
+            
+            // --- Checkout ---
+            document.getElementById('back-to-cart-btn').addEventListener('click', () => {
+                renderCart();
+                renderView('cart');
+            });
+            
+            document.getElementById('prescription-upload').addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    prescriptionFile = e.target.files[0];
+                    document.getElementById('upload-file-name').textContent = prescriptionFile.name;
+                } else {
+                    prescriptionFile = null;
+                    document.getElementById('upload-file-name').textContent = 'Upload Prescription';
+                }
+                validateCheckout();
+            });
+            
+            document.getElementById('prescription-optional').addEventListener('change', (e) => {
+                prescriptionOptional = e.target.checked;
+                validateCheckout();
+            });
+            
+            document.getElementById('payment-options-container').addEventListener('click', (e) => {
+                const paymentButton = e.target.closest('.payment-option');
+                if (paymentButton) {
+                    // Remove 'selected' from all
+                    document.querySelectorAll('.payment-option').forEach(btn => btn.classList.remove('selected'));
+                    // Add 'selected' to clicked
+                    paymentButton.classList.add('selected');
+                    paymentMethod = paymentButton.dataset.method;
+                    validateCheckout();
+                }
+            });
+            
+            document.getElementById('place-order-btn').addEventListener('click', (e) => {
+                handlePlaceOrder(e.currentTarget);
+            });
+            
+            // --- Rating ---
+            const starsContainer = document.getElementById('rating-stars');
+            starsContainer.addEventListener('click', (e) => {
+                const starButton = e.target.closest('button');
+                if (starButton) {
+                    currentRating = parseInt(starButton.dataset.value, 10);
+                    document.getElementById('submit-rating-btn').disabled = false;
+                    
+                    starsContainer.classList.add('selected');
+                    // Remove selected from all
+                    starsContainer.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+                    // Add selected to clicked
+                    starButton.classList.add('selected');
+                }
+            });
+            
+            starsContainer.addEventListener('mouseover', (e) => {
+                const starButton = e.target.closest('button');
+                if (starButton) {
+                    // This CSS-in-JS handles the hover trail
+                    const value = parseInt(starButton.dataset.value, 10);
+                    starsContainer.querySelectorAll('button').forEach((b, i) => {
+                        if (i < value) {
+                            b.querySelector('.icon').style.color = 'var(--color-yellow)';
+                        } else {
+                            b.querySelector('.icon').style.color = ''; // Revert to CSS
+                        }
+                    });
+                }
+            });
+            
+            starsContainer.addEventListener('mouseout', () => {
+                // Revert all to CSS
+                starsContainer.querySelectorAll('button .icon').forEach(icon => icon.style.color = '');
+            });
+            
+            document.getElementById('submit-rating-btn').addEventListener('click', handleSubmitRating);
+        }
+        
+        // --- App Initialization ---
+        
+        function initApp() {
+            if (!firebaseConfig.apiKey) {
+                console.error("Firebase config is missing!");
+                showModal('App Error', 'App configuration is missing. Please contact support.', false);
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                setLogLevel('debug');
+                
+                bindEventListeners();
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        // User is signed in
+                        userId = user.uid;
+                        isAuthReady = true;
+                        console.log("User signed in:", userId);
+                        
+                        headerUserId.textContent = userId.substring(0, 6);
+                        
+                        if (view === 'login') {
+                            renderView('store-select');
+                            renderStoreSelect(); // Populate the store page
+                        }
+                    } else {
+                        // User is signed out, try to sign in
+                        console.log("No user found, signing in...");
+                        try {
+                            const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                            if (token) {
+                                await signInWithCustomToken(auth, token);
+                                console.log("Signed in with custom token.");
+                            } else {
+                                await signInAnonymously(auth);
+                                console.log("Signed in anonymously.");
+                            }
+                        } catch (error) {
+                            console.error("Error signing in:", error);
+                            showModal('Login Error', 'Could not sign in. Please refresh the page.', false);
+                        }
+                    }
+                });
+
+            } catch (e) {
+                console.error("Firebase initialization error:", e);
+                showModal('App Error', 'Could not initialize the app. Please try again later.', false);
+            }
+        }
+        
+        // Start the app
+        initApp();
+
+    </script>
+</body>
+</html>
+
