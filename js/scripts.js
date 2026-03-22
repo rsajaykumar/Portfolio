@@ -283,6 +283,7 @@ if (canvas) {
     let stars = [];
     let asteroids = [];
     let rockets = [];
+    let ufos = [];
     
     function resize() {
         width = canvas.width = canvas.parentElement.offsetWidth;
@@ -412,6 +413,73 @@ if (canvas) {
             ctx.restore();
         }
     }
+
+    class UFO {
+        constructor() {
+            this.active = false;
+        }
+        reset() {
+            this.x = Math.random() < 0.5 ? -100 : width + 100;
+            this.y = Math.random() * (height * 0.6); // Hover in upper 60%
+            this.vx = (this.x < 0 ? 1 : -1) * (Math.random() * 0.5 + 0.5);
+            this.vy = 0;
+            this.hoverOffset = Math.random() * Math.PI * 2;
+            this.size = Math.random() * 0.4 + 0.5;
+            this.active = true;
+        }
+        update() {
+            if(!this.active) return;
+            this.x += this.vx;
+            this.hoverOffset += 0.03;
+            this.y += Math.sin(this.hoverOffset) * 0.5;
+            
+            if (this.x > width + 150 || this.x < -150) {
+                this.active = false;
+            }
+        }
+        draw() {
+            if(!this.active) return;
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.scale(this.size, this.size);
+            
+            // Tractor Beam (flashing)
+            if (Math.random() > 0.1) {
+                ctx.fillStyle = 'rgba(34, 197, 94, 0.15)'; // Money green beam
+                ctx.beginPath();
+                ctx.moveTo(-10, 10);
+                ctx.lineTo(10, 10);
+                ctx.lineTo(40, 150);
+                ctx.lineTo(-40, 150);
+                ctx.fill();
+            }
+
+            // Glass dome
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.beginPath();
+            ctx.arc(0, -5, 12, Math.PI, 0);
+            ctx.fill();
+
+            // UFO Body
+            ctx.fillStyle = '#475569';
+            ctx.beginPath();
+            ctx.ellipse(0, 5, 25, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Lights
+            const time = Date.now();
+            ctx.fillStyle = Math.floor(time / 300) % 2 === 0 ? '#fbbf24' : '#ef4444';
+            ctx.beginPath(); ctx.arc(-15, 5, 2, 0, Math.PI * 2); ctx.fill();
+            
+            ctx.fillStyle = Math.floor(time / 300 + 1) % 2 === 0 ? '#22c55e' : '#3b82f6';
+            ctx.beginPath(); ctx.arc(0, 7, 2, 0, Math.PI * 2); ctx.fill();
+            
+            ctx.fillStyle = Math.floor(time / 300) % 2 === 0 ? '#fbbf24' : '#ef4444';
+            ctx.beginPath(); ctx.arc(15, 5, 2, 0, Math.PI * 2); ctx.fill();
+
+            ctx.restore();
+        }
+    }
     
     function initCanvas() {
         resize();
@@ -430,6 +498,11 @@ if (canvas) {
             r.reset();
             rockets.push(r);
         }
+        
+        // 1 UFO
+        let u = new UFO();
+        u.reset();
+        ufos.push(u);
         
         animate();
     }
@@ -455,6 +528,13 @@ if (canvas) {
             if(!rocket.active && Math.random() < 0.005) rocket.reset(); // Random spawn frequency
             rocket.update();
             rocket.draw();
+        });
+        
+        // Draw UFOs
+        ufos.forEach(ufo => {
+            if(!ufo.active && Math.random() < 0.002) ufo.reset(); // Rare spawn frequency
+            ufo.update();
+            ufo.draw();
         });
     }
     
