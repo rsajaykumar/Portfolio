@@ -273,40 +273,143 @@ if (mobileBtn && navMenu) {
     });
 }
 
-// Canvas Background Network
+// Canvas Space Background
 const canvas = document.getElementById('hero-canvas');
 if (canvas) {
     const ctx = canvas.getContext('2d');
     let width, height;
-    let particles = [];
+    
+    // Arrays for space objects
+    let stars = [];
+    let asteroids = [];
+    let rockets = [];
     
     function resize() {
         width = canvas.width = canvas.parentElement.offsetWidth;
         height = canvas.height = canvas.parentElement.offsetHeight;
     }
     
-    class Particle {
+    class Star {
         constructor() {
             this.x = Math.random() * width;
             this.y = Math.random() * height;
-            this.vx = (Math.random() - 0.5) * 0.5;
-            this.vy = (Math.random() - 0.5) * 0.5;
-            this.radius = Math.random() * 1.5 + 0.5;
+            this.radius = Math.random() * 1.2;
+            this.vy = Math.random() * 0.5 + 0.1; // Fall downwards slowly
+            this.opacity = Math.random();
         }
-        
         update() {
-            this.x += this.vx;
             this.y += this.vy;
-            
-            if (this.x < 0 || this.x > width) this.vx *= -1;
-            if (this.y < 0 || this.y > height) this.vy *= -1;
+            if (this.y > height) {
+                this.y = 0;
+                this.x = Math.random() * width;
+            }
         }
-        
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(34, 197, 94, 0.5)'; // Money green
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
             ctx.fill();
+        }
+    }
+    
+    class Asteroid {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.radius = Math.random() * 3 + 1;
+            this.vx = (Math.random() - 0.5) * 1;
+            this.vy = (Math.random() - 0.5) * 1;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0) this.x = width;
+            if (this.x > width) this.x = 0;
+            if (this.y < 0) this.y = height;
+            if (this.y > height) this.y = 0;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.4)'; // Muted gray asteroid
+            ctx.fill();
+        }
+    }
+    
+    class Rocket {
+        constructor() {
+            this.active = false;
+        }
+        reset() {
+            // Spawn outside bottom or left
+            if(Math.random() > 0.5) {
+                this.x = -50;
+                this.y = Math.random() * height;
+            } else {
+                this.x = Math.random() * width;
+                this.y = height + 50;
+            }
+            this.vx = Math.random() * 3 + 1.5;
+            this.vy = -(Math.random() * 3 + 1.5);
+            this.angle = Math.atan2(this.vy, this.vx);
+            this.size = Math.random() * 0.4 + 0.6; // Scale
+            this.active = true;
+        }
+        update() {
+            if(!this.active) return;
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x > width + 100 || this.y < -100) {
+                this.active = false;
+            }
+        }
+        draw() {
+            if(!this.active) return;
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.scale(this.size, this.size);
+            
+            // Flame
+            ctx.fillStyle = Math.random() > 0.5 ? '#fbbf24' : '#ef4444';
+            ctx.beginPath();
+            ctx.moveTo(-15, -4);
+            ctx.lineTo(-30, 0);
+            ctx.lineTo(-15, 4);
+            ctx.fill();
+
+            // Body
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath();
+            ctx.moveTo(-15, -8);
+            ctx.lineTo(10, -8);
+            ctx.lineTo(25, 0);
+            ctx.lineTo(10, 8);
+            ctx.lineTo(-15, 8);
+            ctx.closePath();
+            ctx.fill();
+
+            // Fins
+            ctx.fillStyle = '#22c55e'; // match money green theme
+            ctx.beginPath();
+            ctx.moveTo(-15, -8);
+            ctx.lineTo(-20, -16);
+            ctx.lineTo(-5, -8);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(-15, 8);
+            ctx.lineTo(-20, 16);
+            ctx.lineTo(-5, 8);
+            ctx.fill();
+
+            // Window
+            ctx.fillStyle = '#0f1115';
+            ctx.beginPath();
+            ctx.arc(5, 0, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
         }
     }
     
@@ -314,64 +417,45 @@ if (canvas) {
         resize();
         window.addEventListener('resize', resize);
         
-        const numParticles = Math.min(Math.floor(window.innerWidth / 15), 100);
-        for (let i = 0; i < numParticles; i++) {
-            particles.push(new Particle());
+        // Populate arrays
+        const numStars = Math.floor(window.innerWidth / 5);
+        for (let i = 0; i < numStars; i++) stars.push(new Star());
+        
+        const numAsteroids = Math.floor(window.innerWidth / 50);
+        for (let i = 0; i < numAsteroids; i++) asteroids.push(new Asteroid());
+        
+        // Just 2 rockets to keep it minimalistic
+        for(let i=0; i<2; i++) {
+            let r = new Rocket();
+            r.reset();
+            rockets.push(r);
         }
         
         animate();
     }
     
-    let mouse = { x: null, y: null };
-    window.addEventListener('mousemove', (e) => {
-        const heroSection = document.getElementById('home');
-        if (window.scrollY > heroSection.offsetHeight) return; // Optimize
-        mouse.x = e.pageX;
-        mouse.y = e.pageY;
-    });
-    
-    window.addEventListener('mouseout', () => {
-        mouse.x = null;
-        mouse.y = null;
-    });
-    
     function animate() {
         requestAnimationFrame(animate);
         ctx.clearRect(0, 0, width, height);
         
-        for (let i = 0; i < particles.length; i++) {
-            particles[i].update();
-            particles[i].draw();
-            
-            for (let j = i; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                
-                if (dist < 120) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = `rgba(34, 197, 94, ${0.15 - dist/800})`;
-                    ctx.lineWidth = 0.5;
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.stroke();
-                }
-            }
-            
-            if (mouse.x != null && mouse.y != null) {
-                const dx = particles[i].x - mouse.x;
-                const dy = particles[i].y - mouse.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 150) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = `rgba(251, 191, 36, ${0.2 - dist/750})`; // Gold connections
-                    ctx.lineWidth = 1;
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(mouse.x, mouse.y);
-                    ctx.stroke();
-                }
-            }
-        }
+        // Draw Stars
+        stars.forEach(star => {
+            star.update();
+            star.draw();
+        });
+        
+        // Draw Asteroids
+        asteroids.forEach(ast => {
+            ast.update();
+            ast.draw();
+        });
+        
+        // Draw Rockets
+        rockets.forEach(rocket => {
+            if(!rocket.active && Math.random() < 0.005) rocket.reset(); // Random spawn frequency
+            rocket.update();
+            rocket.draw();
+        });
     }
     
     initCanvas();
