@@ -492,8 +492,8 @@ if (canvas) {
         const numAsteroids = Math.floor(window.innerWidth / 50);
         for (let i = 0; i < numAsteroids; i++) asteroids.push(new Asteroid());
         
-        // Just 2 rockets to keep it minimalistic
-        for(let i=0; i<2; i++) {
+        // Just 1 rocket to prevent multiple rockets flying
+        for(let i=0; i<1; i++) {
             let r = new Rocket();
             r.reset();
             rockets.push(r);
