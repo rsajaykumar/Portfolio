@@ -1,5 +1,5 @@
 <div align="center">
-  <h1 align="center">My_Portfolio</h1>
+  <h1 align="center">MY PORTFOLIO</h1>
   <p align="center">
     A customizable, minimal, and highly interactive developer portfolio website built using native web technologies with a modern cybernetic aesthetic.
   </p>
