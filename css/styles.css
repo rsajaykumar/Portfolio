@@ -223,7 +223,7 @@ nav a:hover, nav a.active {
 .hero-greeting {
     display: inline-block;
     font-family: 'Outfit', sans-serif;
-    font-weight: 300;
+    font-weight: 700;
     color: var(--accent-cyan);
     font-size: 0.45em;
     letter-spacing: 5px;
