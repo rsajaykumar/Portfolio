@@ -6,9 +6,9 @@ async function fetchGitHubData() {
         // 1. Fetch User Profile
         const userRes = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}`);
         if (!userRes.ok) return; // If user not found or rate limited, silent fail and show static cards
-        
+
         const userData = await userRes.json();
-        
+
         // Show Banner
         document.getElementById('gh-stats').style.display = 'flex';
         document.getElementById('gh-avatar').src = userData.avatar_url;
@@ -21,31 +21,31 @@ async function fetchGitHubData() {
         if (!reposRes.ok) return;
 
         let allRepos = await reposRes.json();
-        
+
         // Filter out snakegame.py
         allRepos = allRepos.filter(repo => repo.name.toLowerCase() !== 'snakegame.py');
-        
+
         // Prioritize Ai-thinker WB2 32S
         const targetRepoIndex = allRepos.findIndex(repo => repo.name.toLowerCase().includes('ai-thinker') || repo.name.toLowerCase().includes('wb2'));
         let reposData = [];
-        
+
         if (targetRepoIndex !== -1) {
             const [targetRepo] = allRepos.splice(targetRepoIndex, 1);
             reposData = [targetRepo, ...allRepos].slice(0, 6);
         } else {
             reposData = allRepos.slice(0, 6);
         }
-        
+
         if (reposData.length > 0) {
             const grid = document.getElementById('github-projects-grid');
             grid.innerHTML = ''; // Clear static cards if API is successful
-            
+
             document.querySelector('.records-count').textContent = `${reposData.length} Live Records Found`;
 
             reposData.forEach(repo => {
                 const date = new Date(repo.updated_at).getFullYear();
                 const language = repo.language || 'Code';
-                
+
                 const cardHTML = `
                     <div class="project-card">
                         <div class="project-header">
@@ -80,7 +80,7 @@ window.addEventListener('scroll', () => {
     let current = '';
     const sections = document.querySelectorAll('section');
     const navLinks = document.querySelectorAll('nav a');
-    
+
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
         if (scrollY >= sectionTop - 150) {
@@ -102,37 +102,37 @@ fetchGitHubData();
 // Terminal Typewriter Effect
 const terminalLines = [
     { cmd: "./fetch_bio.sh", output: "Initializing secure connection... OK\nLoading payload... OK" },
-    { cmd: "cat identity.json", output: "{\n  \"name\": \"Ajay Kumar R S\",\n  \"role\": \"Electrical & Embedded Eng\",\n  \"status\": \"Deployed\"\n}" },
+    { cmd: "cat identity.json", output: "{\n  \"name\": \"Ajay Kumar\",\n  \"role\": \"Electrical & Embedded Eng\",\n  \"status\": \"Deployed\"\n}" },
     { cmd: "whoami", output: "root" }
 ];
 
 async function typeTerminal() {
     const termBody = document.getElementById('term-body');
-    if(!termBody) return;
+    if (!termBody) return;
     termBody.innerHTML = '';
-    
+
     // Animate each command
     for (let i = 0; i < terminalLines.length; i++) {
         const line = terminalLines[i];
-        
+
         // Setup prompt line
         const lineDiv = document.createElement('div');
         lineDiv.className = 'term-line';
         lineDiv.innerHTML = `<span class="term-prompt">admin@node:~#</span><span class="term-command"></span><span class="term-cursor"></span>`;
         termBody.appendChild(lineDiv);
-        
+
         const cmdSpan = lineDiv.querySelector('.term-command');
         const cursor = lineDiv.querySelector('.term-cursor');
-        
+
         // Type the command
         for (let j = 0; j < line.cmd.length; j++) {
             cmdSpan.textContent += line.cmd[j];
             await new Promise(r => setTimeout(r, Math.random() * 50 + 50));
         }
-        
+
         await new Promise(r => setTimeout(r, 400)); // wait before executing
         cursor.remove(); // remove cursor from old line
-        
+
         // Show output
         if (line.output) {
             const outDiv = document.createElement('span');
@@ -142,7 +142,7 @@ async function typeTerminal() {
         }
         await new Promise(r => setTimeout(r, 600)); // wait before next command
     }
-    
+
     // Add final blinking prompt
     const finalDiv = document.createElement('div');
     finalDiv.className = 'term-line';
@@ -154,9 +154,9 @@ async function typeTerminal() {
 let terminalAnimated = false;
 window.addEventListener('scroll', () => {
     const termSection = document.getElementById('terminal');
-    if(termSection && !terminalAnimated) {
+    if (termSection && !terminalAnimated) {
         const rect = termSection.getBoundingClientRect();
-        if(rect.top < window.innerHeight - 100) {
+        if (rect.top < window.innerHeight - 100) {
             terminalAnimated = true;
             typeTerminal();
         }
@@ -169,41 +169,41 @@ const btnDecrypt = document.getElementById('btn-decrypt');
 const encryptedNodes = document.querySelectorAll('.encrypted-data');
 
 if (btnDecrypt) {
-    btnDecrypt.addEventListener('click', function() {
+    btnDecrypt.addEventListener('click', function () {
         if (this.classList.contains('active')) return;
-        
+
         this.classList.add('active');
         this.querySelector('span').textContent = 'DECRYPTION COMPLETE';
-        
+
         encryptedNodes.forEach(node => {
             const valueSpan = node.querySelector('.node-value');
             const finalValue = node.getAttribute('data-value');
             const originalLength = valueSpan.textContent.length;
             const targetLength = finalValue.length;
-            
+
             let iterations = 0;
             const maxIterations = 20;
-            
+
             const interval = setInterval(() => {
                 let currentText = '';
                 const displayLength = Math.max(originalLength, targetLength);
-                
-                for(let i=0; i<displayLength; i++) {
+
+                for (let i = 0; i < displayLength; i++) {
                     if (i < iterations / maxIterations * targetLength) {
                         currentText += finalValue[i] || '';
                     } else {
                         currentText += chars[Math.floor(Math.random() * chars.length)];
                     }
                 }
-                
+
                 valueSpan.textContent = currentText;
-                
+
                 if (iterations >= maxIterations) {
                     clearInterval(interval);
                     valueSpan.textContent = finalValue;
                     valueSpan.classList.add('decrypted-text');
                 }
-                
+
                 iterations += 1;
             }, 50);
         });
@@ -213,31 +213,31 @@ if (btnDecrypt) {
 // Click Spark Effect
 document.addEventListener('click', (e) => {
     // Only trigger if not clicking a link to avoid overriding navigation
-    if(e.target.closest('a') && !e.target.closest('.contact-node')) return;
+    if (e.target.closest('a') && !e.target.closest('.contact-node')) return;
 
     const numSparks = 5;
     const colors = ['#22c55e', '#fbbf24', '#10b981'];
-    
+
     for (let i = 0; i < numSparks; i++) {
         const spark = document.createElement('div');
         spark.className = 'click-spark';
-        
+
         spark.style.left = e.clientX + 'px';
         spark.style.top = e.clientY + 'px';
-        
+
         const angle = (Math.PI * 2 / numSparks) * i + (Math.random() - 0.5);
         const distance = 40 + Math.random() * 40;
-        
+
         const dx = Math.cos(angle) * distance;
         const dy = Math.sin(angle) * distance;
-        
+
         spark.style.setProperty('--dx', `${dx}px`);
         spark.style.setProperty('--dy', `${dy}px`);
-        
+
         spark.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        
+
         document.body.appendChild(spark);
-        
+
         setTimeout(() => {
             spark.remove();
         }, 600);
@@ -278,18 +278,18 @@ const canvas = document.getElementById('hero-canvas');
 if (canvas) {
     const ctx = canvas.getContext('2d');
     let width, height;
-    
+
     // Arrays for space objects
     let stars = [];
     let asteroids = [];
     let rockets = [];
     let ufos = [];
-    
+
     function resize() {
         width = canvas.width = canvas.parentElement.offsetWidth;
         height = canvas.height = canvas.parentElement.offsetHeight;
     }
-    
+
     class Star {
         constructor() {
             this.x = Math.random() * width;
@@ -312,7 +312,7 @@ if (canvas) {
             ctx.fill();
         }
     }
-    
+
     class Asteroid {
         constructor() {
             this.x = Math.random() * width;
@@ -336,14 +336,14 @@ if (canvas) {
             ctx.fill();
         }
     }
-    
+
     class Rocket {
         constructor() {
             this.active = false;
         }
         reset() {
             // Spawn outside bottom or left
-            if(Math.random() > 0.5) {
+            if (Math.random() > 0.5) {
                 this.x = -50;
                 this.y = Math.random() * height;
             } else {
@@ -357,7 +357,7 @@ if (canvas) {
             this.active = true;
         }
         update() {
-            if(!this.active) return;
+            if (!this.active) return;
             this.x += this.vx;
             this.y += this.vy;
             if (this.x > width + 100 || this.y < -100) {
@@ -365,12 +365,12 @@ if (canvas) {
             }
         }
         draw() {
-            if(!this.active) return;
+            if (!this.active) return;
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.rotate(this.angle);
             ctx.scale(this.size, this.size);
-            
+
             // Flame
             ctx.fillStyle = Math.random() > 0.5 ? '#fbbf24' : '#ef4444';
             ctx.beginPath();
@@ -397,7 +397,7 @@ if (canvas) {
             ctx.lineTo(-20, -16);
             ctx.lineTo(-5, -8);
             ctx.fill();
-            
+
             ctx.beginPath();
             ctx.moveTo(-15, 8);
             ctx.lineTo(-20, 16);
@@ -428,21 +428,21 @@ if (canvas) {
             this.active = true;
         }
         update() {
-            if(!this.active) return;
+            if (!this.active) return;
             this.x += this.vx;
             this.hoverOffset += 0.03;
             this.y += Math.sin(this.hoverOffset) * 0.5;
-            
+
             if (this.x > width + 150 || this.x < -150) {
                 this.active = false;
             }
         }
         draw() {
-            if(!this.active) return;
+            if (!this.active) return;
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.scale(this.size, this.size);
-            
+
             // Tractor Beam (flashing)
             if (Math.random() > 0.1) {
                 ctx.fillStyle = 'rgba(34, 197, 94, 0.15)'; // Money green beam
@@ -470,73 +470,73 @@ if (canvas) {
             const time = Date.now();
             ctx.fillStyle = Math.floor(time / 300) % 2 === 0 ? '#fbbf24' : '#ef4444';
             ctx.beginPath(); ctx.arc(-15, 5, 2, 0, Math.PI * 2); ctx.fill();
-            
+
             ctx.fillStyle = Math.floor(time / 300 + 1) % 2 === 0 ? '#22c55e' : '#3b82f6';
             ctx.beginPath(); ctx.arc(0, 7, 2, 0, Math.PI * 2); ctx.fill();
-            
+
             ctx.fillStyle = Math.floor(time / 300) % 2 === 0 ? '#fbbf24' : '#ef4444';
             ctx.beginPath(); ctx.arc(15, 5, 2, 0, Math.PI * 2); ctx.fill();
 
             ctx.restore();
         }
     }
-    
+
     function initCanvas() {
         resize();
         window.addEventListener('resize', resize);
-        
+
         // Populate arrays
         const numStars = Math.floor(window.innerWidth / 5);
         for (let i = 0; i < numStars; i++) stars.push(new Star());
-        
+
         const numAsteroids = Math.floor(window.innerWidth / 50);
         for (let i = 0; i < numAsteroids; i++) asteroids.push(new Asteroid());
-        
+
         // Just 1 rocket to prevent multiple rockets flying
-        for(let i=0; i<1; i++) {
+        for (let i = 0; i < 1; i++) {
             let r = new Rocket();
             r.reset();
             rockets.push(r);
         }
-        
+
         // 1 UFO
         let u = new UFO();
         u.reset();
         ufos.push(u);
-        
+
         animate();
     }
-    
+
     function animate() {
         requestAnimationFrame(animate);
         ctx.clearRect(0, 0, width, height);
-        
+
         // Draw Stars
         stars.forEach(star => {
             star.update();
             star.draw();
         });
-        
+
         // Draw Asteroids
         asteroids.forEach(ast => {
             ast.update();
             ast.draw();
         });
-        
+
         // Draw Rockets
         rockets.forEach(rocket => {
-            if(!rocket.active && Math.random() < 0.005) rocket.reset(); // Random spawn frequency
+            if (!rocket.active && Math.random() < 0.05) rocket.reset(); // Random spawn frequency
             rocket.update();
             rocket.draw();
         });
-        
+
         // Draw UFOs
         ufos.forEach(ufo => {
-            if(!ufo.active && Math.random() < 0.002) ufo.reset(); // Rare spawn frequency
+            if (!ufo.active && Math.random() < 0.002) ufo.reset(); // Rare spawn frequency
             ufo.update();
             ufo.draw();
         });
     }
-    
+
     initCanvas();
 }

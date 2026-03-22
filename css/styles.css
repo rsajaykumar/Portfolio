@@ -209,15 +209,22 @@ nav a:hover, nav a.active {
     animation: pulse 2s infinite;
 }
 
+@keyframes cyberFade {
+    0% { opacity: 0; filter: blur(10px); transform: translateX(-30px); }
+    100% { opacity: 1; filter: blur(0); transform: translateX(0); }
+}
+
 .hero-greeting {
     display: inline-block;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
+    font-weight: 300;
     color: var(--accent-cyan);
     font-size: 0.5em;
+    letter-spacing: 1px;
     margin-right: 0.5rem;
-    vertical-align: middle;
+    vertical-align: baseline;
     opacity: 0;
-    animation: fadeIn 1s ease 0.8s forwards;
+    animation: cyberFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s forwards;
 }
 
 .hero-title {
