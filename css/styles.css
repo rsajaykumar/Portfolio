@@ -209,14 +209,18 @@ nav a:hover, nav a.active {
     animation: pulse 2s infinite;
 }
 
-@keyframes fadeInUp {
+@keyframes sweepReveal {
     0% {
         opacity: 0;
-        transform: translateY(10px);
+        transform: scaleX(0);
+        transform-origin: left;
+        filter: brightness(2);
     }
     100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: scaleX(1);
+        transform-origin: left;
+        filter: brightness(1);
     }
 }
 
@@ -231,7 +235,7 @@ nav a:hover, nav a.active {
     margin-right: 1.2rem;
     vertical-align: middle;
     opacity: 0;
-    animation: fadeInUp 0.8s ease-out 0.5s forwards;
+    animation: sweepReveal 1s cubic-bezier(0.77, 0, 0.175, 1) 0.5s forwards;
 }
 
 .hero-title {
@@ -951,11 +955,52 @@ body.menu-open {
     gap: 1.5rem;
     text-decoration: none;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-node::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        transparent 50%,
+        rgba(34, 197, 94, 0.05) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .contact-node:hover {
     border-color: var(--accent-cyan);
-    transform: translateX(5px);
+    transform: translateX(8px);
+    box-shadow: -10px 0 20px rgba(34, 197, 94, 0.1);
+}
+
+.contact-node:hover::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        to bottom right,
+        transparent,
+        rgba(34, 197, 94, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+    0% { transform: translateY(-50%) rotate(45deg); }
+    100% { transform: translateY(50%) rotate(45deg); }
 }
 
 .node-icon {
@@ -963,11 +1008,13 @@ body.menu-open {
     height: 48px;
     border-radius: 8px;
     background: var(--accent-cyan-dim);
+    border: 1px solid rgba(34, 197, 94, 0.2);
     color: var(--accent-cyan);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    z-index: 2;
 }
 
 .node-info {
@@ -975,17 +1022,20 @@ body.menu-open {
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
+    z-index: 2;
 }
 
 .node-label {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--text-muted);
+    font-size: 0.7rem;
+    color: var(--accent-cyan);
+    letter-spacing: 2px;
+    text-transform: uppercase;
     margin-bottom: 0.3rem;
 }
 
 .node-value {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--text-main);
     font-family: var(--font-mono);
     font-weight: 500;

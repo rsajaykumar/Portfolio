@@ -182,7 +182,7 @@ if (btnDecrypt) {
             const targetLength = finalValue.length;
 
             let iterations = 0;
-            const maxIterations = 20;
+            const maxIterations = 15;
 
             const interval = setInterval(() => {
                 let currentText = '';
@@ -202,10 +202,16 @@ if (btnDecrypt) {
                     clearInterval(interval);
                     valueSpan.textContent = finalValue;
                     valueSpan.classList.add('decrypted-text');
+                    
+                    // Small aesthetic success flash
+                    node.style.borderColor = 'var(--accent-cyan)';
+                    setTimeout(() => {
+                        node.style.borderColor = '';
+                    }, 500);
                 }
 
                 iterations += 1;
-            }, 50);
+            }, 30);
         });
     });
 }
