@@ -17,10 +17,24 @@ async function fetchGitHubData() {
         document.getElementById('gh-repos').textContent = userData.public_repos;
 
         // 2. Fetch Pinned or Top Repos
-        const reposRes = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=6`);
+        const reposRes = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=20`);
         if (!reposRes.ok) return;
 
-        const reposData = await reposRes.json();
+        let allRepos = await reposRes.json();
+        
+        // Filter out snakegame.py
+        allRepos = allRepos.filter(repo => repo.name.toLowerCase() !== 'snakegame.py');
+        
+        // Prioritize Ai-thinker WB2 32S
+        const targetRepoIndex = allRepos.findIndex(repo => repo.name.toLowerCase().includes('ai-thinker') || repo.name.toLowerCase().includes('wb2'));
+        let reposData = [];
+        
+        if (targetRepoIndex !== -1) {
+            const [targetRepo] = allRepos.splice(targetRepoIndex, 1);
+            reposData = [targetRepo, ...allRepos].slice(0, 6);
+        } else {
+            reposData = allRepos.slice(0, 6);
+        }
         
         if (reposData.length > 0) {
             const grid = document.getElementById('github-projects-grid');
