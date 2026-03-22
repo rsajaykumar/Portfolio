@@ -216,7 +216,7 @@ document.addEventListener('click', (e) => {
     if(e.target.closest('a') && !e.target.closest('.contact-node')) return;
 
     const numSparks = 5;
-    const colors = ['#22d3ee', '#facc15', '#34d399'];
+    const colors = ['#22c55e', '#fbbf24', '#10b981'];
     
     for (let i = 0; i < numSparks; i++) {
         const spark = document.createElement('div');
