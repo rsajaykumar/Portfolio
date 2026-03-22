@@ -155,11 +155,22 @@ nav a:hover, nav a.active {
     text-align: center;
 }
 
+#hero-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
 .hero-glow {
     position: absolute;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(34, 211, 238, 0.05) 0%, rgba(15, 17, 21, 0) 70%);
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.05) 0%, rgba(15, 17, 21, 0) 70%);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
