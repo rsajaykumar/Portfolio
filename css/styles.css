@@ -1201,6 +1201,7 @@ html { scroll-behavior: smooth; }
 }
 .form-input::placeholder { color: var(--text-muted); }
 .form-input:focus {
+    border: 2px solid #ffff;
     border-color: var(--accent-cyan);
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
