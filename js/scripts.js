@@ -1,5 +1,26 @@
-// Set GitHub Username Here
-const GITHUB_USERNAME = 'rsajaykumar'; // Using true actual username for dynamic fetching!
+// ============================================================
+// Configuration
+// ============================================================
+const GITHUB_USERNAME = 'rsajaykumar';
+
+// ============================================================
+// Scroll-Reveal (IntersectionObserver)
+// ============================================================
+(function () {
+    const revealEls = document.querySelectorAll('.reveal');
+    if (!revealEls.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+
+    revealEls.forEach(el => observer.observe(el));
+})();
 
 async function fetchGitHubData() {
     try {
@@ -40,7 +61,8 @@ async function fetchGitHubData() {
             const grid = document.getElementById('github-projects-grid');
             grid.innerHTML = ''; // Clear static cards if API is successful
 
-            document.querySelector('.records-count').textContent = `${reposData.length} Live Records Found`;
+            const rc = document.getElementById('records-count-el');
+            if (rc) rc.textContent = `${reposData.length} records fetched`;
 
             reposData.forEach(repo => {
                 const date = new Date(repo.updated_at).getFullYear();
@@ -75,26 +97,7 @@ async function fetchGitHubData() {
     }
 }
 
-// Active link highlighting for semantic scrolling
-window.addEventListener('scroll', () => {
-    let current = '';
-    const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('nav a');
-
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        if (scrollY >= sectionTop - 150) {
-            current = section.getAttribute('id');
-        }
-    });
-
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').includes(current)) {
-            link.classList.add('active');
-        }
-    });
-});
+// (Active link highlighting moved to bottom with mobile nav)
 
 // Initialize GitHub Fetching
 fetchGitHubData();
@@ -163,56 +166,30 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Decryption Effect for Contact Section
-const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$*&%';
-const btnDecrypt = document.getElementById('btn-decrypt');
-const encryptedNodes = document.querySelectorAll('.encrypted-data');
+// Contact Form — mailto: handler
+const contactForm = document.getElementById('contact-form');
+if (contactForm) {
+    contactForm.addEventListener('submit', function (e) {
+        e.preventDefault();
 
-if (btnDecrypt) {
-    btnDecrypt.addEventListener('click', function () {
-        if (this.classList.contains('active')) return;
+        const name    = document.getElementById('name').value.trim();
+        const email   = document.getElementById('email').value.trim();
+        const subject = document.getElementById('subject').value.trim() || 'Portfolio Contact';
+        const message = document.getElementById('message').value.trim();
 
-        this.classList.add('active');
-        this.querySelector('span').textContent = 'DECRYPTION COMPLETE';
+        const body = `Hi Ajay,\n\n${message}\n\n---\nSent by: ${name}\nReply to: ${email}`;
 
-        encryptedNodes.forEach(node => {
-            const valueSpan = node.querySelector('.node-value');
-            const finalValue = node.getAttribute('data-value');
-            const originalLength = valueSpan.textContent.length;
-            const targetLength = finalValue.length;
+        const mailtoLink = `mailto:rsajaykumar12@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailtoLink;
 
-            let iterations = 0;
-            const maxIterations = 15;
-
-            const interval = setInterval(() => {
-                let currentText = '';
-                const displayLength = Math.max(originalLength, targetLength);
-
-                for (let i = 0; i < displayLength; i++) {
-                    if (i < iterations / maxIterations * targetLength) {
-                        currentText += finalValue[i] || '';
-                    } else {
-                        currentText += chars[Math.floor(Math.random() * chars.length)];
-                    }
-                }
-
-                valueSpan.textContent = currentText;
-
-                if (iterations >= maxIterations) {
-                    clearInterval(interval);
-                    valueSpan.textContent = finalValue;
-                    valueSpan.classList.add('decrypted-text');
-                    
-                    // Small aesthetic success flash
-                    node.style.borderColor = 'var(--accent-cyan)';
-                    setTimeout(() => {
-                        node.style.borderColor = '';
-                    }, 500);
-                }
-
-                iterations += 1;
-            }, 30);
-        });
+        // Visual feedback
+        const btn = document.getElementById('btn-send');
+        btn.textContent = '✓ Opening Mail Client...';
+        btn.style.background = '#16a34a';
+        setTimeout(() => {
+            btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Send Message`;
+            btn.style.background = '';
+        }, 3000);
     });
 }
 
@@ -250,34 +227,56 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Mobile Menu Toggle
+// ============================================================
+// Mobile Menu Toggle  (pill nav)
+// ============================================================
 const mobileBtn = document.getElementById('mobile-menu-btn');
-const navMenu = document.getElementById('nav-menu');
-const mobileNavLinks = navMenu ? navMenu.querySelectorAll('a') : [];
+const navMenu   = document.getElementById('nav-menu');
+
+function closeMobileNav() {
+    if (!navMenu) return;
+    navMenu.classList.remove('mobile-open');
+    if (mobileBtn) {
+        mobileBtn.classList.remove('active');
+        mobileBtn.setAttribute('aria-expanded', 'false');
+    }
+}
 
 if (mobileBtn && navMenu) {
     mobileBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // prevent closing immediately
-        navMenu.classList.toggle('open');
-        document.body.classList.toggle('menu-open');
+        e.stopPropagation();
+        const isOpen = navMenu.classList.toggle('mobile-open');
+        mobileBtn.classList.toggle('active', isOpen);
+        mobileBtn.setAttribute('aria-expanded', String(isOpen));
     });
 
-    // Close menu when a link is clicked
-    mobileNavLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('open');
-            document.body.classList.remove('menu-open');
-        });
+    navMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeMobileNav);
     });
 
-    // Close menu when clicking outside
     document.addEventListener('click', (e) => {
-        if (navMenu.classList.contains('open') && !navMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
-            navMenu.classList.remove('open');
-            document.body.classList.remove('menu-open');
+        if (
+            navMenu.classList.contains('mobile-open') &&
+            !navMenu.contains(e.target) &&
+            !mobileBtn.contains(e.target)
+        ) {
+            closeMobileNav();
         }
     });
 }
+
+// ============================================================
+// Active Nav Link Highlighting
+// ============================================================
+window.addEventListener('scroll', () => {
+    let current = '';
+    document.querySelectorAll('section').forEach(section => {
+        if (scrollY >= section.offsetTop - 160) current = section.getAttribute('id');
+    });
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+}, { passive: true });
 
 // Canvas Space Background
 const canvas = document.getElementById('hero-canvas');
