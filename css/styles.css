@@ -346,8 +346,8 @@ header {
     position: absolute;
     bottom: 2.5rem;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--text-muted);
+    font-size: 0.78rem;
+    color: var(--text-main);
     letter-spacing: 2px;
     text-transform: uppercase;
     opacity: 0;
@@ -356,8 +356,8 @@ header {
 }
 .hero-corner-left  { left: 2.5rem; text-align: left; }
 .hero-corner-right { right: 2.5rem; text-align: right; }
-.hero-corner .label { display: block; color: var(--text-dim); font-size: 0.65rem; margin-bottom: 0.2rem; }
-.hero-corner .value { color: var(--text-muted); }
+.hero-corner .label { display: block; margin-bottom: 0.2rem; color: var(--accent-cyan); font-size: 0.65rem; opacity: 0.8; }
+.hero-corner .value { color: var(--text-main); font-weight: 600; }
 
 /* Scroll indicator */
 .hero-scroll {
