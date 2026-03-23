@@ -1189,7 +1189,7 @@ html { scroll-behavior: smooth; }
 
 .form-input {
     background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    border: 1px solid rgba(34, 197, 94, 0.4);
     border-radius: 6px;
     padding: 0.85rem 1rem;
     color: var(--text-main);
